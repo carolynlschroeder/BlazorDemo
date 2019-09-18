@@ -1,0 +1,22 @@
+﻿@using BlazorDemo.Data
+@inject ContactService ContactService
+
+<h3>Contact Details</h3>
+<div>@contact.Name</div>
+<div>@contact.Address</div>
+<div>@contact.City</div>
+<div>@contact.State</div>
+<div>@contact.Zip</div>
+
+@code {
+
+    [Parameter]
+    public Guid ContactId { get; set; }
+    Contact contact;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        contact = await ContactService.GetContactAsync(ContactId);
+        
+    }
+}

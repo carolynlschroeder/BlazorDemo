@@ -1,0 +1,92 @@
+﻿@page "/contacts"
+
+@using BlazorDemo.Data
+@using System.Text.RegularExpressions
+@inject ContactService ContactService
+
+<h1>Contacts</h1>
+
+@if (contacts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div><input placeholder="Filter by Name" class="form-control" @onkeydown="FilterName" /></div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>City</th>
+                <th>State</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var contact in contacts)
+            {
+                <tr>
+                    <td>@contact.Name</td>
+                    <td>@contact.City</td>
+                    <td>@contact.State</td>
+                    <td><button @onclick="@(() => ShowDetails(contact.ContactId))" class="btn btn-primary">Details</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div>
+        @if (contactId != null)
+        {
+      <DetailsComponent ContactId="@contactId.Value"></DetailsComponent>
+        }
+</div>
+
+}
+
+
+@code {
+    List<Contact> contacts;
+    String name;
+    Guid? contactId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        contacts = await ContactService.GetContactsAsync();
+    }
+
+
+    void FilterName(KeyboardEventArgs args)
+    {
+
+        contacts = ContactService.GetContactsAsync().GetAwaiter().GetResult();
+
+        if(args.Key == "Backspace")
+        {
+            name = name.Substring(0, name.Length - 1);
+        }
+        else if(IsAlphabetic(args.Key))
+        {
+            name += args.Key;
+        }
+
+        if (!String.IsNullOrEmpty(name))
+        {
+            contacts = contacts.Where(c => c.Name.ToLower().Contains(name.ToLower())).ToList();
+        }
+
+    }
+    void ShowDetails(Guid id)
+    {
+        contactId = id;
+    }
+
+    private bool IsAlphabetic(string s)
+    {
+        string pattern = @"[a-zA-Z]";
+        if(Regex.IsMatch(s, pattern))
+        {
+            return true;
+        }
+        return false;
+    }
+}
