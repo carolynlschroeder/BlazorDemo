@@ -64,7 +64,7 @@ else
         {
             name = name.Substring(0, name.Length - 1);
         }
-        else if(IsAlphabetic(args.Key))
+        else if(args.Key != "Shift")
         {
             name += args.Key;
         }
@@ -80,13 +80,4 @@ else
         contactId = id;
     }
 
-    private bool IsAlphabetic(string s)
-    {
-        string pattern = @"[a-zA-Z]";
-        if(Regex.IsMatch(s, pattern))
-        {
-            return true;
-        }
-        return false;
-    }
 }
